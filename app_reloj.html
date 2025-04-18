@@ -1,0 +1,363 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control de Asistencia</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="app_reloj.css">
+</head>
+<body>
+    <!-- Interfaz Principal -->
+    <div id="main-interface" class="container mx-auto py-8">
+        <div class="card p-8 hall-effect">
+            <h1 class="text-center text-3xl font-bold mb-6 text-blue-400">Sistema de Control de Asistencia</h1>
+            
+            <!-- Reloj Digital -->
+            <div class="mb-8">
+                <div id="digital-clock" class="digital-clock">00:00:00</div>
+                <div id="date-display" class="date-display">Lunes, 1 de Enero de 2024</div>
+            </div>
+            
+            <!-- Formulario de registro -->
+            <div class="mb-6">
+                <label for="employeeCode" class="block mb-2 text-sm font-medium">Código de Empleado</label>
+                <input type="text" id="employeeCode" class="form-control w-full px-4 py-3 rounded-lg text-lg" placeholder="Ingrese su código">
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <button id="clockInBtn" class="btn-success px-6 py-4 rounded-lg text-lg font-bold flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Registrar Entrada
+                </button>
+                <button id="clockOutBtn" class="btn-danger px-6 py-4 rounded-lg text-lg font-bold flex items-center justify-center">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Registrar Salida
+                </button>
+            </div>
+            
+            <!-- Estado reciente -->
+            <div id="recentStatus" class="text-center text-lg mt-4"></div>
+        </div>
+    </div>
+    
+    <!-- Botón de configuración -->
+    <button id="configBtn" class="config-btn">
+        <i class="fas fa-cog text-xl"></i>
+    </button>
+    
+    <!-- Modal de Admin Login -->
+    <div id="adminLoginModal" class="modal fixed inset-0 hidden flex items-center justify-center z-50">
+        <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+        <div class="modal-content relative bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h2 class="text-xl font-bold mb-4">Acceso Administrativo</h2>
+            <div class="mb-4">
+                <label for="adminCode" class="block mb-2 text-sm font-medium">Código de Administrador</label>
+                <input type="password" id="adminCode" class="form-control w-full px-4 py-3 rounded-lg" placeholder="Ingrese el código de administrador">
+                <p class="text-xs text-gray-400 mt-2">Código predeterminado: 691015</p>
+            </div>
+            <div class="flex justify-end">
+                <button id="cancelAdminBtn" class="btn-danger px-4 py-2 rounded-lg mr-2">Cancelar</button>
+                <button id="loginAdminBtn" class="btn-primary px-4 py-2 rounded-lg">Acceder</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panel Administrativo -->
+    <div id="adminPanel" class="hidden container mx-auto py-8 fade-in">
+        <div class="mb-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Panel Administrativo</h1>
+            <button id="exitAdminBtn" class="btn-danger px-4 py-2 rounded-lg">
+                <i class="fas fa-sign-out-alt mr-1"></i> Salir
+            </button>
+        </div>
+        
+        <!-- Tabs de Navegación -->
+        <div class="flex mb-4 bg-gray-800 rounded-lg overflow-hidden">
+            <div id="tab-employees" class="tab active">
+                <i class="fas fa-users mr-2"></i> Empleados
+            </div>
+            <div id="tab-records" class="tab">
+                <i class="fas fa-clipboard-list mr-2"></i> Registros
+            </div>
+            <div id="tab-reports" class="tab">
+                <i class="fas fa-chart-bar mr-2"></i> Reportes
+            </div>
+            <div id="tab-settings" class="tab">
+                <i class="fas fa-cog mr-2"></i> Configuración
+            </div>
+        </div>
+        
+        <!-- Contenido de la Tab Empleados -->
+        <div id="content-employees" class="tab-content admin-section">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-xl font-bold">Gestión de Empleados</h2>
+                <button id="addEmployeeBtn" class="btn-success px-4 py-2 rounded-lg">
+                    <i class="fas fa-plus mr-1"></i> Nuevo Empleado
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table id="employeesTable" class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Departamento</th>
+                            <th>Código</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llenará con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Contenido de la Tab Registros -->
+        <div id="content-records" class="tab-content admin-section hidden">
+            <h2 class="text-xl font-bold mb-4">Registros de Asistencia</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="recordEmployee" class="block mb-2 text-sm font-medium">Empleado</label>
+                    <select id="recordEmployee" class="form-control w-full px-4 py-2 rounded-lg">
+                        <option value="all">Todos los empleados</option>
+                        <!-- Se llenará con JavaScript -->
+                    </select>
+                </div>
+                <div>
+                    <label for="recordDateFrom" class="block mb-2 text-sm font-medium">Desde</label>
+                    <input type="date" id="recordDateFrom" class="form-control w-full px-4 py-2 rounded-lg">
+                </div>
+                <div>
+                    <label for="recordDateTo" class="block mb-2 text-sm font-medium">Hasta</label>
+                    <input type="date" id="recordDateTo" class="form-control w-full px-4 py-2 rounded-lg">
+                </div>
+            </div>
+            
+            <button id="filterRecordsBtn" class="btn-primary px-4 py-2 rounded-lg mb-4">
+                <i class="fas fa-filter mr-1"></i> Filtrar
+            </button>
+            
+            <div class="overflow-x-auto">
+                <table id="recordsTable" class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th>Empleado</th>
+                            <th>Fecha</th>
+                            <th>Hora Entrada</th>
+                            <th>Hora Salida</th>
+                            <th>Horas Trabajadas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llenará con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Contenido de la Tab Reportes -->
+        <div id="content-reports" class="tab-content admin-section hidden">
+            <h2 class="text-xl font-bold mb-4">Generación de Reportes</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="reportType" class="block mb-2 text-sm font-medium">Tipo de Reporte</label>
+                    <select id="reportType" class="form-control w-full px-4 py-2 rounded-lg">
+                        <option value="attendance">Asistencia</option>
+                        <option value="hours">Horas Trabajadas</option>
+                        <option value="tardiness">Tardanzas</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="reportEmployee" class="block mb-2 text-sm font-medium">Empleado</label>
+                    <select id="reportEmployee" class="form-control w-full px-4 py-2 rounded-lg">
+                        <option value="all">Todos los empleados</option>
+                        <!-- Se llenará con JavaScript -->
+                    </select>
+                </div>
+                <div>
+                    <label for="reportPeriod" class="block mb-2 text-sm font-medium">Periodo</label>
+                    <select id="reportPeriod" class="form-control w-full px-4 py-2 rounded-lg">
+                        <option value="week">Última semana</option>
+                        <option value="month">Último mes</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="customDateRange" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 hidden">
+                <div>
+                    <label for="reportDateFrom" class="block mb-2 text-sm font-medium">Desde</label>
+                    <input type="date" id="reportDateFrom" class="form-control w-full px-4 py-2 rounded-lg">
+                </div>
+                <div>
+                    <label for="reportDateTo" class="block mb-2 text-sm font-medium">Hasta</label>
+                    <input type="date" id="reportDateTo" class="form-control w-full px-4 py-2 rounded-lg">
+                </div>
+            </div>
+            
+            <div class="flex space-x-2 mb-6">
+                <button id="generateReportBtn" class="btn-primary px-4 py-2 rounded-lg">
+                    <i class="fas fa-chart-line mr-1"></i> Generar Reporte
+                </button>
+                <button id="downloadCsvBtn" class="btn-success px-4 py-2 rounded-lg">
+                    <i class="fas fa-file-csv mr-1"></i> Exportar CSV
+                </button>
+                <button id="downloadPdfBtn" class="btn-danger px-4 py-2 rounded-lg">
+                    <i class="fas fa-file-pdf mr-1"></i> Exportar PDF
+                </button>
+            </div>
+            
+            <div id="reportResult" class="bg-gray-900 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">Vista previa del reporte</h3>
+                <div id="reportChart" class="h-64 bg-gray-800 rounded-lg mb-4 flex items-center justify-center">
+                    <p class="text-gray-400">Genera un reporte para ver la gráfica</p>
+                </div>
+                <div id="reportSummary" class="bg-gray-800 p-4 rounded-lg">
+                    <p class="text-gray-400">El resumen del reporte aparecerá aquí</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenido de la Tab Configuración -->
+        <div id="content-settings" class="tab-content admin-section hidden">
+            <h2 class="text-xl font-bold mb-4">Configuración del Sistema</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3">Ajustes de Seguridad</h3>
+                    
+                    <div class="mb-4">
+                        <label for="adminCodeSetting" class="block mb-2 text-sm font-medium">Código de Administrador</label>
+                        <input type="password" id="adminCodeSetting" class="form-control w-full px-4 py-2 rounded-lg" placeholder="Nuevo código de administrador">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="enableBackup" class="mr-2">
+                            <label for="enableBackup">Habilitar respaldo automático</label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="backupFrequency" class="block mb-2 text-sm font-medium">Frecuencia de respaldo</label>
+                        <select id="backupFrequency" class="form-control w-full px-4 py-2 rounded-lg">
+                            <option value="daily">Diario</option>
+                            <option value="weekly">Semanal</option>
+                            <option value="monthly">Mensual</option>
+                        </select>
+                    </div>
+                    
+                    <button id="saveSecurityBtn" class="btn-primary px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-1"></i> Guardar Ajustes
+                    </button>
+                </div>
+                
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3">Gestión de Datos</h3>
+                    
+                    <div class="mb-4">
+                        <button id="backupNowBtn" class="btn-success px-4 py-2 rounded-lg w-full mb-2">
+                            <i class="fas fa-download mr-1"></i> Crear Respaldo Ahora
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <button id="restoreBackupBtn" class="btn-warning px-4 py-2 rounded-lg w-full mb-2 bg-yellow-600 hover:bg-yellow-700">
+                            <i class="fas fa-upload mr-1"></i> Restaurar Respaldo
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <button id="resetDataBtn" class="btn-danger px-4 py-2 rounded-lg w-full">
+                            <i class="fas fa-trash-alt mr-1"></i> Reiniciar Sistema
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-medium mb-2">Última copia de seguridad:</h4>
+                        <p id="lastBackupDate" class="text-sm text-gray-400">Nunca</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium mb-2">Estadísticas de la base de datos:</h4>
+                        <p id="dbStats" class="text-sm text-gray-400">
+                            Empleados: 0<br>
+                            Registros: 0<br>
+                            Tamaño aproximado: 0 KB
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Empleado -->
+    <div id="employeeModal" class="modal fixed inset-0 hidden flex items-center justify-center z-50">
+        <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+        <div class="modal-content relative bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h2 id="employeeModalTitle" class="text-xl font-bold mb-4">Nuevo Empleado</h2>
+            <div class="mb-4">
+                <label for="employeeName" class="block mb-2 text-sm font-medium">Nombre Completo</label>
+                <input type="text" id="employeeName" class="form-control w-full px-4 py-2 rounded-lg" placeholder="Nombre del empleado">
+            </div>
+            <div class="mb-4">
+                <label for="employeeDepartment" class="block mb-2 text-sm font-medium">Departamento</label>
+                <select id="employeeDepartment" class="form-control w-full px-4 py-2 rounded-lg">
+                    <option value="Administración">Administración</option>
+                    <option value="Ventas">Ventas</option>
+                    <option value="Producción">Producción</option>
+                    <option value="Tecnología">Tecnología</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="employeeCodeInput" class="block mb-2 text-sm font-medium">Código de Empleado</label>
+                <div class="flex">
+                    <input type="text" id="employeeCodeInput" class="form-control w-full px-4 py-2 rounded-l-lg" placeholder="Código único">
+                    <button id="generateCodeBtn" class="bg-blue-600 px-4 py-2 rounded-r-lg">
+                        <i class="fas fa-random"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="employeeStatus" class="block mb-2 text-sm font-medium">Estado</label>
+                <select id="employeeStatus" class="form-control w-full px-4 py-2 rounded-lg">
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+            </div>
+            <input type="hidden" id="employeeId">
+            <div class="flex justify-end">
+                <button id="cancelEmployeeBtn" class="btn-danger px-4 py-2 rounded-lg mr-2">Cancelar</button>
+                <button id="saveEmployeeBtn" class="btn-primary px-4 py-2 rounded-lg">Guardar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmación -->
+    <div id="confirmModal" class="modal fixed inset-0 hidden flex items-center justify-center z-50">
+        <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+        <div class="modal-content relative bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h2 class="text-xl font-bold mb-4">Confirmar Acción</h2>
+            <p id="confirmMessage" class="mb-6">¿Está seguro de que desea realizar esta acción?</p>
+            <div class="flex justify-end">
+                <button id="cancelConfirmBtn" class="btn-danger px-4 py-2 rounded-lg mr-2">Cancelar</button>
+                <button id="confirmActionBtn" class="btn-primary px-4 py-2 rounded-lg">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notificación -->
+    <div id="notification" class="notification">
+        <span id="notificationMessage">Operación completada con éxito</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app_reloj.js"></script>
+</body>
+</html>

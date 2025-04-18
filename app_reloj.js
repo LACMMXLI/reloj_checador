@@ -1389,10 +1389,3 @@ function calculateHoursWorked(timeIn, timeOut) {
     
     return `${hours}.${minutes < 10 ? '0' + minutes : minutes}`;
 }
-    
-    // Actualizar interfaz
-    setTimeout(() => {
-        loadEmployees();
-        showNotification('Se han cargado datos de ejemplo para mostrar la funcionalidad del sistema', 'info');
-    }, 500);
-}

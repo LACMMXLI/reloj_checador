@@ -62,12 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('cancelConfirmBtn').addEventListener('click', hideConfirmModal);
         document.getElementById('confirmActionBtn').addEventListener('click', executeConfirmAction);
         
-        // Cargar datos iniciales
-        loadEmployees();
-        updateDatabaseStats();
-        
-        // Agregar empleados de ejemplo si no hay ninguno
-        checkAndAddSampleData();
     });
 });
 

@@ -286,7 +286,23 @@
         <!-- Contenido de la Tab Adelantos -->
         <div id="content-advances" class="tab-content admin-section hidden">
             <h2 class="text-xl font-bold mb-4">Historial de Adelantos</h2>
-            <div class="overflow-x-auto">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="advanceEmployeeFilter" class="block mb-2 text-sm font-medium">Filtrar por Empleado</label>
+                    <select id="advanceEmployeeFilter" class="form-control w-full px-4 py-2 rounded-lg">
+                        <option value="all">Todos los empleados</option>
+                        <!-- Se llenará con JavaScript -->
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="filterAdvancesBtn" class="btn-primary px-4 py-2 rounded-lg">
+                        <i class="fas fa-filter mr-1"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto mb-6">
                 <table id="advancesTable" class="min-w-full">
                     <thead>
                         <tr>
@@ -300,6 +316,20 @@
                         <!-- Se llenará con JavaScript -->
                     </tbody>
                 </table>
+            </div>
+
+            <h3 class="text-xl font-bold mb-4">Generar Reporte de Adelantos</h3>
+            <div class="flex space-x-2 mb-6">
+                <button id="generateAdvanceReportBtn" class="btn-primary px-4 py-2 rounded-lg">
+                    <i class="fas fa-chart-line mr-1"></i> Generar Reporte
+                </button>
+            </div>
+
+            <div id="advanceReportResult" class="bg-gray-900 p-4 rounded-lg hidden">
+                <h3 class="text-lg font-semibold mb-2">Resumen del Reporte</h3>
+                <div id="advanceReportSummary" class="bg-gray-800 p-4 rounded-lg">
+                    <p class="text-gray-400">El resumen del reporte aparecerá aquí</p>
+                </div>
             </div>
         </div>
 

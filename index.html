@@ -44,6 +44,9 @@
     <button id="configBtn" class="config-btn">
         <i class="fas fa-cog text-xl"></i>
     </button>
+    <button id="cashierBtn" class="config-btn" style="bottom: 80px;">
+        <i class="fas fa-cash-register text-xl"></i>
+    </button>
     
     <!-- Modal de Admin Login -->
     <div id="adminLoginModal" class="modal fixed inset-0 hidden flex items-center justify-center z-50">
@@ -62,6 +65,60 @@
         </div>
     </div>
     
+    <!-- Modal de Cajero Login -->
+    <div id="cashierLoginModal" class="modal fixed inset-0 hidden flex items-center justify-center z-50">
+        <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+        <div class="modal-content relative bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h2 class="text-xl font-bold mb-4">Acceso de Cajero</h2>
+            <div class="mb-4">
+                <label for="cashierCode" class="block mb-2 text-sm font-medium">Código de Cajero</label>
+                <input type="password" id="cashierCode" class="form-control w-full px-4 py-3 rounded-lg" placeholder="Ingrese el código de cajero">
+                <p class="text-xs text-gray-400 mt-2">Código predeterminado: 123456</p>
+            </div>
+            <div class="flex justify-end">
+                <button id="cancelCashierBtn" class="btn-danger px-4 py-2 rounded-lg mr-2">Cancelar</button>
+                <button id="loginCashierBtn" class="btn-primary px-4 py-2 rounded-lg">Acceder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Cajero -->
+    <div id="cashierPanel" class="hidden container mx-auto py-8 fade-in">
+        <div class="card p-8 hall-effect max-w-lg mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">Adelanto de Sueldo</h1>
+                <button id="exitCashierBtn" class="btn-danger px-4 py-2 rounded-lg">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Salir
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <label for="cashierEmployeeCode" class="block mb-2 text-sm font-medium">Código de Empleado</label>
+                <div class="flex">
+                    <input type="text" id="cashierEmployeeCode" class="form-control w-full px-4 py-2 rounded-l-lg" placeholder="Ingrese el código">
+                    <button id="searchEmployeeBtn" class="bg-blue-600 px-4 py-2 rounded-r-lg">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="cashierEmployeeInfo" class="hidden bg-gray-900 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Información del Empleado</h3>
+                <p><strong>Nombre:</strong> <span id="cashierEmployeeName"></span></p>
+            </div>
+
+            <div id="cashierAdvanceSection" class="hidden">
+                <div class="mb-4">
+                    <label for="advanceAmount" class="block mb-2 text-sm font-medium">Monto del Adelanto</label>
+                    <input type="number" id="advanceAmount" class="form-control w-full px-4 py-2 rounded-lg" placeholder="Ingrese el monto">
+                </div>
+                <button id="confirmAdvanceBtn" class="btn-success w-full px-6 py-3 rounded-lg text-lg font-bold">
+                    Confirmar Adelanto
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Panel Administrativo -->
     <div id="adminPanel" class="hidden container mx-auto py-8 fade-in">
         <div class="mb-4 flex justify-between items-center">
@@ -81,6 +138,9 @@
             </div>
             <div id="tab-reports" class="tab">
                 <i class="fas fa-chart-bar mr-2"></i> Reportes
+            </div>
+            <div id="tab-advances" class="tab">
+                <i class="fas fa-file-invoice-dollar mr-2"></i> Adelantos
             </div>
             <div id="tab-settings" class="tab">
                 <i class="fas fa-cog mr-2"></i> Configuración
@@ -223,6 +283,26 @@
             </div>
         </div>
         
+        <!-- Contenido de la Tab Adelantos -->
+        <div id="content-advances" class="tab-content admin-section hidden">
+            <h2 class="text-xl font-bold mb-4">Historial de Adelantos</h2>
+            <div class="overflow-x-auto">
+                <table id="advancesTable" class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th>ID de Adelanto</th>
+                            <th>Empleado</th>
+                            <th>Monto</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llenará con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Contenido de la Tab Configuración -->
         <div id="content-settings" class="tab-content admin-section hidden">
             <h2 class="text-xl font-bold mb-4">Configuración del Sistema</h2>
@@ -234,6 +314,11 @@
                     <div class="mb-4">
                         <label for="adminCodeSetting" class="block mb-2 text-sm font-medium">Código de Administrador</label>
                         <input type="password" id="adminCodeSetting" class="form-control w-full px-4 py-2 rounded-lg" placeholder="Nuevo código de administrador">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="cashierCodeSetting" class="block mb-2 text-sm font-medium">Código de Cajero</label>
+                        <input type="password" id="cashierCodeSetting" class="form-control w-full px-4 py-2 rounded-lg" placeholder="Nuevo código de cajero">
                     </div>
                     
                     <div class="mb-4">

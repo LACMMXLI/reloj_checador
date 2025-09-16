@@ -3,6 +3,7 @@ let currentEmployeeId = null;
 let currentConfirmCallback = null;
 let employeesData = [];
 let recordsData = [];
+let advancesData = [];
 const DEFAULT_ADMIN_CODE = '691015';
 const DEFAULT_CASHIER_CODE = '123456';
 let systemSettings = {
@@ -42,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Eventos del panel de administración
         document.getElementById('exitAdminBtn').addEventListener('click', exitAdminPanel);
+        document.getElementById('filterAdvancesBtn').addEventListener('click', loadAdvances);
+        document.getElementById('generateAdvanceReportBtn').addEventListener('click', generateAdvanceReport);
 
         // Eventos de las tabs
         document.getElementById('tab-employees').addEventListener('click', () => switchTab('employees'));
@@ -462,6 +465,7 @@ function switchTab(tabName) {
     } else if (tabName === 'reports') {
         loadEmployeesForSelect('reportEmployee');
     } else if (tabName === 'advances') {
+        loadEmployeesForSelect('advanceEmployeeFilter');
         loadAdvances();
     } else if (tabName === 'settings') {
         loadSettingsForm();
@@ -771,14 +775,21 @@ function renderRecordsTable() {
 // ----- GESTIÓN DE ADELANTOS -----
 
 function loadAdvances() {
+    const employeeIdFilter = document.getElementById('advanceEmployeeFilter').value;
     const transaction = db.transaction(['advances'], 'readonly');
     const advanceStore = transaction.objectStore('advances');
     const request = advanceStore.getAll();
 
     request.onsuccess = (event) => {
-        const advances = event.target.result;
+        let advances = event.target.result;
+
+        if (employeeIdFilter !== 'all') {
+            advances = advances.filter(adv => adv.employeeId === parseInt(employeeIdFilter));
+        }
+
         advances.sort((a, b) => b.timestamp - a.timestamp); // Sort by most recent
-        renderAdvancesTable(advances);
+        advancesData = advances; // Store for reporting
+        renderAdvancesTable(advancesData);
     };
 
     request.onerror = () => {
@@ -805,6 +816,32 @@ function renderAdvancesTable(advances) {
         `;
         tableBody.appendChild(row);
     });
+}
+
+function generateAdvanceReport() {
+    const reportResult = document.getElementById('advanceReportResult');
+    const reportSummary = document.getElementById('advanceReportSummary');
+
+    if (advancesData.length === 0) {
+        showNotification('No hay datos para generar un reporte', 'error');
+        reportResult.classList.add('hidden');
+        return;
+    }
+
+    const totalAmount = advancesData.reduce((sum, adv) => sum + adv.amount, 0);
+    const totalAdvances = advancesData.length;
+    const employeeFilter = document.getElementById('advanceEmployeeFilter');
+    const selectedEmployee = employeeFilter.options[employeeFilter.selectedIndex].text;
+
+    let summaryHTML = `
+        <p class="mb-2"><strong>Empleado:</strong> ${selectedEmployee}</p>
+        <p class="mb-2"><strong>Total de Adelantos:</strong> ${totalAdvances}</p>
+        <p><strong>Monto Total Adelantado:</strong> ${totalAmount.toFixed(2)}</p>
+    `;
+
+    reportSummary.innerHTML = summaryHTML;
+    reportResult.classList.remove('hidden');
+    showNotification('Reporte de adelantos generado con éxito', 'success');
 }
 
 // ----- GESTIÓN DE REPORTES -----
@@ -1262,6 +1299,7 @@ function downloadReportPdf() {
 // Cargar configuración en el formulario
 function loadSettingsForm() {
     document.getElementById('adminCodeSetting').value = '';
+    document.getElementById('cashierCodeSetting').value = '';
     document.getElementById('enableBackup').checked = systemSettings.enableBackup;
     document.getElementById('backupFrequency').value = systemSettings.backupFrequency;
 
@@ -1416,7 +1454,8 @@ function loadSettings() {
         const settings = event.target.result;
 
         if (settings) {
-            systemSettings = settings.value;
+            // Merge loaded settings with defaults to ensure new settings are applied
+            systemSettings = { ...systemSettings, ...settings.value };
         }
     };
 }
